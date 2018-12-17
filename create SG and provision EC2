@@ -1,0 +1,41 @@
+
+# Create a security group and provision EC2 instance
+# !) Create a custom security group 
+# 2) spins up new EC2 Instance 
+# 3) Waits for ssh to become active on Instance 
+#
+- hosts: localhost 
+  tasks:
+
+    - name: Setting up Security Group 
+      ec2_group: 
+         name: Becca_AWS_Security_Group 
+         description: Rules allowing Traffic on Port 22 and 80 
+         region: us-east-2
+         rules:
+          - proto: tcp
+            from_port: 80
+            to_port: 80
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 22 
+            to_port: 22 
+            cidr_ip: 0.0.0.0/0
+         rules_egress:
+          - proto: all 
+            cidr_ip: 0.0.0.0/0
+    - name: Provision a EC2 Instance
+      ec2:
+         key_name: aws_key
+         region: us-east-2
+         instance_type: t2.micro
+         image: ami-0cf31d971a3ca20d6
+         wait: yes
+         count: 1 
+         monitoring: no 
+         vpc_subnet_id: subnet-3d88eb55
+         assign_public_ip: yes 
+         group: Becca_AWS_Security_Group
+
+
+..
